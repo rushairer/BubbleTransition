@@ -10,32 +10,39 @@ import UIKit
 import BubbleTransition
 
 class ViewController: UIViewController, UIViewControllerTransitioningDelegate {
-
-    @IBOutlet weak var transitionButton: UIButton!
-
-    let transition = BubbleTransition()
-
-    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-        let controller = segue.destinationViewController
-        controller.transitioningDelegate = self
-        controller.modalPresentationStyle = .Custom
+  @IBOutlet weak var transitionButton: UIButton!
+  
+  let transition = BubbleTransition()
+  let interactiveTransition = BubbleInteractiveTransition()
+  
+  override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+    if let controller = segue.destination as? ModalViewController {
+      controller.transitioningDelegate = self
+      controller.modalPresentationStyle = .custom
+      controller.interactiveTransition = interactiveTransition
+      interactiveTransition.attach(to: controller)
     }
-
-    // MARK: UIViewControllerTransitioningDelegate
-
-    func animationControllerForPresentedController(presented: UIViewController, presentingController presenting: UIViewController, sourceController source: UIViewController) -> UIViewControllerAnimatedTransitioning? {
-        transition.transitionMode = .Present
-        transition.startingPoint = transitionButton.center
-        transition.bubbleColor = transitionButton.backgroundColor!
-        return transition
-    }
-
-    func animationControllerForDismissedController(dismissed: UIViewController) -> UIViewControllerAnimatedTransitioning? {
-        transition.transitionMode = .Dismiss
-        transition.startingPoint = transitionButton.center
-        transition.bubbleColor = transitionButton.backgroundColor!
-        return transition
-    }
-
+  }
+  
+  // MARK: UIViewControllerTransitioningDelegate
+  
+  func animationController(forPresented presented: UIViewController, presenting: UIViewController, source: UIViewController) -> UIViewControllerAnimatedTransitioning? {
+    transition.transitionMode = .present
+    transition.startingPoint = transitionButton.center
+    transition.bubbleColor = transitionButton.backgroundColor!
+    return transition
+  }
+  
+  func animationController(forDismissed dismissed: UIViewController) -> UIViewControllerAnimatedTransitioning? {
+    transition.transitionMode = .dismiss
+    transition.startingPoint = transitionButton.center
+    transition.bubbleColor = transitionButton.backgroundColor!
+    return transition
+  }
+  
+  func interactionControllerForDismissal(using animator: UIViewControllerAnimatedTransitioning) -> UIViewControllerInteractiveTransitioning? {
+    return interactiveTransition
+  }
+  
 }
 
